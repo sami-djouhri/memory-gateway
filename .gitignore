@@ -1,0 +1,6 @@
+.env
+*.bak*
+*.preplan
+.venv/
+__pycache__/
+*.pyc

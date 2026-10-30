@@ -1,0 +1,58 @@
+services:
+  memory-gateway:
+    container_name: memory-gateway
+    user: "1000:1000"
+    build: .
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - cc-apps
+    ports:
+      - "192.0.2.10:8081:8081"
+    env_file:
+      - .env
+      - ../.env.gateway
+      - ../.env.memory-api
+    environment:
+      - EMBED_API_URL=http://192.0.2.10:8082/v1
+      - EMBED_MODEL=bge-m3
+      - LLM_UPSTREAM_NAME=${LLM_UPSTREAM_NAME:-node2}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://192.0.2.10:8081}
+      - MEMORY_API_URL=http://192.0.2.10:8765
+      - MAX_MEMORY_NOTES=4
+      - MAX_CONTEXT_NOTES=3
+      - SEARCH_CANDIDATE_LIMIT=4
+      - MEMORY_RELATED_LIMIT=3
+      - MAX_STALE_NOTE_AGE_DAYS=45
+      - REVIEW_GRACE_DAYS=3
+      - AUTO_REMEMBER_ENABLED=false
+      - AUTO_REMEMBER_ALLOWED_CATEGORIES=fact,preference,decision
+      - AUTO_REMEMBER_MIN_CHARS=140
+      - AUTO_REMEMBER_MAX_ITEMS=3
+      - HTTP_TIMEOUT_SECONDS=600
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/livez', timeout=8).read()\"",
+        ]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 10s
+
+networks:
+  cc-apps:
+    external: true
