@@ -30,7 +30,7 @@ services:
       - EMBED_MODEL=bge-m3
       - LLM_UPSTREAM_NAME=${LLM_UPSTREAM_NAME:-node2}
       - LLM_BASE_URL=${LLM_BASE_URL:-http://192.0.2.10:8081}
-      - MEMORY_API_URL=http://192.0.2.10:8765
+      - MEMORY_API_URL=http://obsidian-memory:8765
       - MAX_MEMORY_NOTES=4
       - MAX_CONTEXT_NOTES=3
       - SEARCH_CANDIDATE_LIMIT=4
